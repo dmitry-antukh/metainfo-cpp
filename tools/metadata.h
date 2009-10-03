@@ -8,8 +8,9 @@
 
 
 #if !defined(META_LIB_ASSERT)
-    /// you must define for example "#define META_LIB_ASSERT(expr, error) assert(expr)"
-#	error META_LIB_ASSERT(expr, error) not defined 
+/// you must define META_LIB_ASSERT(expr, errorDescription), for example 
+/// #define META_LIB_ASSERT(expr, errorDescription) assert(expr)
+#	error META_LIB_ASSERT(expr, errorDescription) not defined 
 #endif // !defined(META_LIB_ASSERT)
 
 

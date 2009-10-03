@@ -4,7 +4,7 @@
 
 #include <assert.h>
 
-#define META_LIB_ASSERT(expr, error) assert(expr)
+#define META_LIB_ASSERT(expr, errorDescription) assert(expr)
 
 
 #if defined(__BORLANDC__)
