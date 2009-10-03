@@ -2,15 +2,38 @@
 #define Treater2_090208_H
 
 #include <typeinfo>
-#include <Tools/metadata.h>
+
+#include <tools/metadata.h>
 #include "struct.h"
 #include "treater.h"
 
-std::string to_str(int i)
+
+#include <sstream>
+#include <stdexcept>
+
+template<typename T>
+inline bool toStr(T const& val, std::string* s)
 {
-    char buf[32];
-    return std::string(itoa(i, buf, 10));
+    std::stringstream ss;
+    ss << val;
+
+    bool res=bool(ss);
+    //bool res=!ss.bad() && !ss.fail();
+
+    if(s && res) *s=ss.str();
+    return res;
 }
+
+template<typename T>
+inline std::string toStr(T const& val)
+{
+    std::string s;
+    if(!toStr(val, &s)) 
+        throw std::runtime_error("Cannot convert value to string");
+        
+    return s;
+}
+
 
 template<typename T>
 class PrintStruct
@@ -25,7 +48,7 @@ public:
     void operator() (M (T::*pM)(Par1), unsigned index)
     {
         ::Meta::Name name =
-            Meta::Attribute<T_BcbWa>::template get<::Meta::Name>(index);
+            Meta::Attribute<T_BcbWa>::template get<Meta::Name>(index);
             
         Attr1 const& nameT = 
             Meta::Attribute<T_BcbWa>::template get<Attr1>();
@@ -53,7 +76,7 @@ public:
         {
 			Impl<M>::treatData(
             	(m_data.*pM)[i],
-				m_s + "." + name.s + "[" + to_str(i) + "]",
+				m_s + "." + name.s + "[" + toStr(i) + "]",
 				TK());
         }
     }
