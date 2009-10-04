@@ -17,8 +17,7 @@ inline bool toStr(T const& val, std::string* s)
     std::stringstream ss;
     ss << val;
 
-    bool res=bool(ss);
-    //bool res=!ss.bad() && !ss.fail();
+    bool res=!ss.bad() && !ss.fail();
 
     if(s && res) *s=ss.str();
     return res;
