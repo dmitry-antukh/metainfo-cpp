@@ -202,10 +202,6 @@
 				RelativePath=".\treater.h"
 				>
 			</File>
-			<File
-				RelativePath=".\typedefs.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
