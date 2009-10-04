@@ -11,7 +11,6 @@ DEFINES=
 
 LINKFLAGS=
 
-
 OBJ_DIR=debug.gcc
 
 
@@ -20,7 +19,6 @@ OBJ_DIR=debug.gcc
 # =============
 
 O_EXT=.o
-            
 
 GCC=$(PREFIX)g++
 LD=$(PREFIX)ld
