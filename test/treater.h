@@ -1,5 +1,5 @@
-#ifndef Treater_090208_H
-#define Treater_090208_H
+#ifndef Treater_080909_H
+#define Treater_080909_H
 
 #include <iostream>
 #include <iomanip>
@@ -20,4 +20,4 @@ template<> struct TypeTraits<double>          { typedef SimpleTypeTag TypeKind; 
 template<> struct TypeTraits<std::string>     { typedef SimpleTypeTag TypeKind; };
 
 
-#endif // Treater_090208_H
+#endif // Treater_080909_H

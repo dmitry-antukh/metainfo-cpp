@@ -1,5 +1,5 @@
-#ifndef Metadata_090208_H
-#define Metadata_090208_H
+#ifndef Metadata_060909_H
+#define Metadata_060909_H
 
 #include <assert.h>
 #include <typeinfo>
@@ -355,4 +355,4 @@ private:
 } // namespace Meta
 
 
-#endif
+#endif // Metadata_060909_H
