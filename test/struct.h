@@ -10,13 +10,14 @@ struct Attr1
     std::string s;
 };
 
+template<typename T>
 struct S0
 {
-    int i0;
+    T i0;
     
     S0() : i0(125) {}
 	
-	void add(int n) { i0 += n; }
+	void add(T const& n) { i0 += n; }
 
 	METADATA(S0)
 	{
@@ -36,7 +37,7 @@ struct S
     
     int         a_i[3];
     
-    S0 s0;
+    S0<int>     s0;
 
     S() : i(31415), d(2.718281828), s("hello world") 
     {
