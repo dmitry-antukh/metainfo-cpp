@@ -1,9 +1,9 @@
-#ifndef TEST_141008_H
-#define TEST_141008_H
+#ifndef TEST_140909_H
+#define TEST_140909_H
 
 #include "struct.h"
 
 
 void print(std::string const& descr, S const& s);
 
-#endif // TEST_141008_H
+#endif // TEST_140909_H

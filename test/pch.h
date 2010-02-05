@@ -1,5 +1,5 @@
-#ifndef DP_PCH_H_27122007
-#define DP_PCH_H_27122007
+#ifndef PCH_170909_H
+#define PCH_170909_H
 
 
 #include <assert.h>
@@ -18,5 +18,4 @@
 #endif // _MSC_VER == 1400
 
 
-#endif  // DP_PCH_H_27122007
-
+#endif  // PCH_170909_H
