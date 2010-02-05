@@ -41,7 +41,12 @@ public:
 	explicit PrintStruct(T const& data, std::string const& s = "") :
         m_data(data),
         m_s(s)
-    {}
+    {
+        Attr1 const* userNameT = 
+            Meta::Attribute<T_BcbWa>::template query<Attr1>();
+        if(NULL != userNameT)
+            std::cout << "*** user name of struct =" << userNameT->s << " ***" << std::endl;
+    }
 
     template<typename M, typename Par1>
     void operator() (M (T::*pM)(Par1), unsigned index)

@@ -19,7 +19,7 @@
 #else // !defined(METADATA)
 #   define METADATA(TypeName) 										                    \
     	template<typename AddMember, typename AttrList>								    \
-	    static void defineMetaInfo(AddMember& addMember, AttrList& attrList, TypeName*) \
+	    static void defineMetaInfo(AddMember& addMember, AttrList const& attrList, TypeName*) \
 	    {															                    \
 		    typedef TypeName		TypeT;
 #endif // !defined(METADATA)
@@ -45,6 +45,14 @@
 #else
 #   define END_METADATA }
 #endif
+
+
+#if defined(BASE_CLASS_METADATA)
+#   error BASE_CLASS_METADATA already defined
+#else // !defined(BASE_CLASS_METADATA)
+#   define BASE_CLASS_METADATA(BaseClassName) 										    \
+        Meta::defineMetaInfo(addMember, attrList.createAttrListForBaseClass(), static_cast<BaseClassName*>(NULL))
+#endif // !defined(BASE_CLASS_METADATA)
 
 
 
@@ -133,7 +141,7 @@ public:
 	template<typename Attr>
 	static Attr const* query()
 	{
-		Attr const* attr = Impl<Attr>::inst().a_attr;
+		Attr const* attr = Impl<Attr>::inst().m_attr;
 		
 		return attr;
 	}
@@ -224,19 +232,30 @@ class AttrList
 {
 public:
 	template<typename Attr>
-	AttrList& operator << (Attr const& attr)
+	AttrList const& operator << (Attr const& attr) const
 	{
 		typedef typename Attribute<T>::template Impl<Attr>  AttrImpl;
 
-		if(!Attribute<T>::inited())
+		if(m_active && !Attribute<T>::inited())
 			AttrImpl::inst().setAttribute(attr);
 
 		return *this;
 	}
-private:
-    explicit AttrList() {}
 	
-	~AttrList() { Attribute<T>::inited() =  true; }
+	~AttrList() 
+    { 
+        if(m_active)
+            Attribute<T>::inited() = true; 
+    }
+
+    AttrList<TreaterType, T> createAttrListForBaseClass() const
+    {
+        return AttrList<TreaterType, T>(false);
+    }
+private:
+    explicit AttrList(bool active = true) : m_active(active) {}
+
+    bool    m_active;
 
     template<typename, typename> friend class MemberInfo;
 };
@@ -289,13 +308,13 @@ private:
 
 /// initMemberList helper
 template<typename AddMember, typename AttrList, typename T>
-void defineMetaInfo(AddMember& addMember, AttrList& attrList, T*)
+void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T*)
 {
     T::defineMetaInfo(addMember, attrList, static_cast<T*>(0));
 }
 
 template<typename AddMember, typename AttrList, typename T>
-void defineMetaInfo(AddMember& addMember, AttrList& attrList, T const*)
+void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T const*)
 {
     T::defineMetaInfo(addMember, attrList, static_cast<T*>(0));
 }
