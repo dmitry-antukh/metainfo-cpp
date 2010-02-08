@@ -47,12 +47,12 @@
 #endif
 
 
-#if defined(BASE_CLASS_METADATA)
-#   error BASE_CLASS_METADATA already defined
-#else // !defined(BASE_CLASS_METADATA)
-#   define BASE_CLASS_METADATA(BaseClassName) 										    \
-        Meta::defineMetaInfo(addMember, attrList.createAttrListForBaseClass(), static_cast<BaseClassName*>(NULL))
-#endif // !defined(BASE_CLASS_METADATA)
+#if defined(BASE_CLASS)
+#   error BASE_CLASS already defined
+#else // !defined(BASE_CLASS)
+#   define BASE_CLASS(BaseClassName) 										    \
+        addMember(Meta::BaseClass<TypeT, BaseClassName>())
+#endif // !defined(BASE_CLASS)
 
 
 
@@ -99,7 +99,25 @@ private:
     PMemberType m_pMember;
 };
 
+
 } // namespace Detail
+
+
+template<typename ClassT, typename BaseClassT>
+class BaseClass
+{
+public:
+	BaseClassT& operator()(ClassT& obj) const
+	{ 
+		BaseClassT* baseObj = &obj;
+		return *baseObj;
+	}
+	BaseClassT const& operator()(ClassT const& obj) const
+	{ 
+		BaseClassT const* baseObj = &obj;
+		return *baseObj;
+	}
+};
 
 
 struct NoAttr

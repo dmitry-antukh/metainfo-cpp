@@ -48,6 +48,8 @@ public:
             std::cout << "*** user name of struct =" << userNameT->s << " ***" << std::endl;
     }
 
+	//void operator()(...)	{}
+
     template<typename M, typename Par1>
     void operator() (M (T::*pM)(Par1), unsigned index)
     {
@@ -84,6 +86,13 @@ public:
 				TK());
         }
     }
+	template<typename BaseClassT>
+	void operator() (Meta::BaseClass<T, BaseClassT> const& baseClass, unsigned index)
+	{
+		PrintStruct<BaseClassT> printStruct(m_data, m_s);
+		
+		Meta::MemberInfo<PrintStruct<BaseClassT>, BaseClassT>::inst().treatData(printStruct);
+	}
 private:
     /// non-copyable
     explicit PrintStruct(PrintStruct const&);

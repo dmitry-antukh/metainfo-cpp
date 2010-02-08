@@ -38,7 +38,7 @@ struct S1 : public S0<T>
     
     METADATA(S1)
     {
-        BASE_CLASS_METADATA(S0<T>);
+        BASE_CLASS(S0<T>);
 
         ATTRIBUTES << Attr1("My-S1");
 
