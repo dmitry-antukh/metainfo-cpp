@@ -1,5 +1,7 @@
 #include "pch.h"
-#pragma hdrstop
+#if !defined(__GNUC__)
+#	pragma hdrstop
+#endif // !defined(__GNUC__)
 
 #include <string>
 #include <iostream>
