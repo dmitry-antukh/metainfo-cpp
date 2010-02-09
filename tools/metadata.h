@@ -255,26 +255,18 @@ public:
 	{
 		typedef typename Attribute<T>::template Impl<Attr>  AttrImpl;
 
-		if(m_active && !Attribute<T>::inited())
+		if(!Attribute<T>::inited())
 			AttrImpl::inst().setAttribute(attr);
 
 		return *this;
 	}
 	
 	~AttrList() 
-    { 
-        if(m_active)
-            Attribute<T>::inited() = true; 
-    }
-
-    AttrList<TreaterType, T> createAttrListForBaseClass() const
     {
-        return AttrList<TreaterType, T>(false);
+		Attribute<T>::inited() = true; 
     }
 private:
-    explicit AttrList(bool active = true) : m_active(active) {}
-
-    bool    m_active;
+    explicit AttrList() {}
 
     template<typename, typename> friend class MemberInfo;
 };
