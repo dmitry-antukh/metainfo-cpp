@@ -2,3 +2,11 @@ test.dsk
 test.ncb
 test.suo
 test.vcproj.*.*.user
+test.mk
+test.project
+test.tags
+test.workspace
+test.workspace.session
+test_wsp.mk
+tags
+
