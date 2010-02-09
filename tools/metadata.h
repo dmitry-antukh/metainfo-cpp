@@ -51,7 +51,8 @@
 #   error BASE_CLASS already defined
 #else // !defined(BASE_CLASS)
 #   define BASE_CLASS(BaseClassName) 										    \
-        addMember(Meta::BaseClass<TypeT, BaseClassName>())
+		typedef BaseClassName 				BaseClassName_BccWA;				\
+        addMember(Meta::BaseClass<TypeT, BaseClassName_BccWA>())
 #endif // !defined(BASE_CLASS)
 
 
