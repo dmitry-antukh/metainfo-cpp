@@ -60,17 +60,11 @@
 namespace Meta
 {
 
-
-template<typename, typename T>                           class MemberInfo;
-
-
-namespace Detail
-{
-
-
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////  Member info  //////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+
+template<typename, typename T>                           class MemberInfo;
 
 template<typename TreaterType>
 class IMember
@@ -81,6 +75,9 @@ public:
 
     virtual ~IMember() {}
 };
+
+namespace Detail
+{
 
 template<typename TreaterType, typename PMemberType>
 class Member : public IMember<TreaterType>
@@ -353,7 +350,7 @@ public:
     template<typename PMemberType>
     MemberList<TreaterType, T>& operator() (PMemberType pMember)
     {
-        Detail::IMember<TreaterType>* mt =
+        IMember<TreaterType>* mt =
             new Detail::Member<TreaterType, PMemberType>(pMember);
 
         ma_member.push_back(mt);
@@ -381,7 +378,7 @@ private:
         }
     }
 
-    std::vector< Detail::IMember<TreaterType>* >      ma_member;
+    std::vector< IMember<TreaterType>* >      ma_member;
 
     friend class MemberInfo<TreaterType, T>;
 };
