@@ -208,16 +208,18 @@ private:
 #endif // !defined(__BORLANDC__)
 		{
 			static Impl<Attr_BccWA> s_inst;
-			return s_inst;
-		}
-
-		explicit Impl() : m_attr(NULL)
-        {
+			
             if(!Attribute<T>::m_inited)
             {
                 Attribute<T>::m_inited = true;
                 Attribute<T>::init();
             }
+			
+			return s_inst;
+		}
+
+		explicit Impl() : m_attr(NULL)
+        {
         }
 
 		~Impl()
