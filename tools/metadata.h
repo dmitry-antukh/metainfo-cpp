@@ -276,8 +276,12 @@ private:
         template<typename PMemberType>
         MemberListHelper& operator() (PMemberType pMember)
         {
-            pMember;
+			#if defined(__BORLANDC__)
+            pMember; /// to prevent bcc-warning
+			#endif // defined(__BORLANDC__)
+			
             ++m_memberIndex;
+			
 		    return *this;
         }
 
@@ -329,7 +333,10 @@ public:
 	template<typename Attr>
 	AttrList const& operator << (Attr const& attr) const
 	{
-        attr;
+        #if defined(__BORLANDC__)
+		attr; /// to prevent bcc-warning
+		#endif // defined(__BORLANDC__)
+		
 		return *this;
 	}
 	
@@ -357,7 +364,10 @@ public:
 	template<typename Attr>
 	MemberList<TreaterType, T>& operator << (Attr const& attr)
 	{
-        attr;
+        #if defined(__BORLANDC__)
+		attr; /// to prevent bcc-warning
+		#endif // defined(__BORLANDC__)
+		
 		return *this;
 	}
 private:
