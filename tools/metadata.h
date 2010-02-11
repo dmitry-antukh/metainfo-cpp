@@ -141,12 +141,25 @@ private:
 
 template<typename, typename> class MemberList;
 
+
+/// initMemberList helper
+template<typename AddMember, typename AttrList, typename T>
+void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T*)
+{
+    T::defineMetaInfo(addMember, attrList, static_cast<T*>(0));
+}
+
+template<typename AddMember, typename AttrList, typename T>
+void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T const*)
+{
+    T::defineMetaInfo(addMember, attrList, static_cast<T*>(0));
+}
+
+
 template<typename T>
 class Attribute
 {
 public:
-	explicit Attribute() {}
-
 	template<typename Attr>
 	static Attr const& get()
 	{
@@ -183,22 +196,32 @@ public:
 		return (index < a_attr.size()) ? a_attr[index] : NULL;
 	}
 private:
+    
 	template<typename Attr>
-	struct Impl
+	class Impl
 	{
-		typedef std::vector<Attr*> AttrList; 
+    public:
+        typedef Attr                        Attr_BccWA;
+		typedef std::vector<Attr_BccWA*>    AttrList; 
 		
 #if defined(__BORLANDC__)
 		static Impl& inst() 
 #else // !defined(__BORLANDC__)
-        static Impl<Attr>& inst() 
+        static Impl<Attr_BccWA>& inst() 
 #endif // !defined(__BORLANDC__)
 		{
-			static Impl<Attr> s_inst;
+			static Impl<Attr_BccWA> s_inst;
 			return s_inst;
 		}
 
-		explicit Impl() : m_attr(NULL) {}
+		explicit Impl() : m_attr(NULL)
+        {
+            if(!Attribute<T>::m_inited)
+            {
+                Attribute<T>::m_inited = true;
+                Attribute<T>::init();
+            }
+        }
 
 		~Impl()
 		{
@@ -208,43 +231,96 @@ private:
 				delete ma_attr[i];
 		}
 		
-		void add(Attr const& attr, unsigned index)
+		void add(Attr_BccWA const& attr, unsigned index)
 		{
 			META_LIB_ASSERT(index >= ma_attr.size(), "attribute already defined");
 			
 			ma_attr.resize(index + 1, NULL);
-			ma_attr[index] = new Attr(attr);
+			ma_attr[index] = new Attr_BccWA(attr);
 
 			//std::cout << "type=" << typeid(T).name() << " attribute=" << typeid(Attr).name() <<
 				//" set for index=" << index << std::endl;
 		}
 		
-        void setAttribute(Attr const& attr)
+        void setAttribute(Attr_BccWA const& attr)
         {
 			META_LIB_ASSERT(NULL == m_attr, "attribute already defined");
 			
-            m_attr = new Attr(attr);
+            m_attr = new Attr_BccWA(attr);
         }
 
-		Attr*		m_attr;
+		Attr_BccWA*	m_attr;
 		AttrList 	ma_attr;
-	};	
+        bool        m_inited;
+	};
+        
+    class AttrListHelper
+    {
+    public:
+	    template<typename Attr>
+	    AttrListHelper const& operator << (Attr const& attr) const
+	    {
+		    typedef typename Attribute<T>::template Impl<Attr>  AttrImpl;
+
+		    AttrImpl::inst().setAttribute(attr);
+
+		    return *this;
+	    }
+    };
+
+    class MemberListHelper
+    {
+    public:
+        MemberListHelper() : m_memberIndex(-1) {}
+
+        template<typename PMemberType>
+        MemberListHelper& operator() (PMemberType pMember)
+        {
+            pMember;
+            ++m_memberIndex;
+		    return *this;
+        }
+
+	    template<typename Attr>
+	    MemberListHelper& operator << (Attr const& attr)
+	    {
+		    typedef typename Attribute<T>::template Impl<Attr>  AttrImpl;
+
+		    META_LIB_ASSERT(m_memberIndex >= 0, "cannot add attribute if there's no members");
+
+		    AttrImpl::inst().add(attr, m_memberIndex);
+
+		    return *this;
+	    }
+    private:
+        int      m_memberIndex;
+    };
+
+    
+    inline static void init()
+    {
+        MemberListHelper    memberListHelper;
+        AttrListHelper      attrListHelper;
+
+        defineMetaInfo(memberListHelper, attrListHelper, static_cast<T*>(NULL));
+    }
+
+
 private:	
 	///// private copyable
 	//Attribute(Attribute<T> const&) {}
 	//Attribute<T>& operator= (Attribute<T> const&) {}
 		
-	static bool& inited()
-	{
-		static bool s_inited = false;
-		
-		return s_inited;
-	}
-		
+    static bool m_inited;
 private:
 	template<typename, typename> friend class MemberList;
 	template<typename, typename> friend class AttrList;
+    template<typename> friend class Impl;
 };
+
+template<typename T>
+bool Attribute<T>::m_inited = false;
+
 
 template<typename TreaterType, typename T>
 class AttrList
@@ -253,31 +329,22 @@ public:
 	template<typename Attr>
 	AttrList const& operator << (Attr const& attr) const
 	{
-		typedef typename Attribute<T>::template Impl<Attr>  AttrImpl;
-
-		if(!Attribute<T>::inited())
-			AttrImpl::inst().setAttribute(attr);
-
+        attr;
 		return *this;
 	}
 	
-	~AttrList() 
-    {
-		Attribute<T>::inited() = true; 
-    }
 private:
     explicit AttrList() {}
 
-    template<typename, typename> friend class MemberInfo;
+    friend class MemberInfo<TreaterType, T>;
 };
-
 
 template<typename TreaterType, typename T>
 class MemberList
 {
 public:
     template<typename PMemberType>
-    MemberList& operator() (PMemberType pMember)
+    MemberList<TreaterType, T>& operator() (PMemberType pMember)
     {
         Detail::IMember<TreaterType>* mt =
             new Detail::Member<TreaterType, PMemberType>(pMember);
@@ -288,16 +355,9 @@ public:
     }
 
 	template<typename Attr>
-	MemberList& operator << (Attr const& attr)
+	MemberList<TreaterType, T>& operator << (Attr const& attr)
 	{
-		typedef typename Attribute<T>::template Impl<Attr>  AttrImpl;
-		//AttrImpl::AttrList& attrImpl = AttrImpl::inst(); /// stupid gcc don't understand it
-
-		META_LIB_ASSERT(!ma_member.empty(), "cannot add attribute if there's no members");
-
-		if(!Attribute<T>::inited())
-			AttrImpl::inst().add(attr, ma_member.size() - 1);
-
+        attr;
 		return *this;
 	}
 private:
@@ -311,24 +371,10 @@ private:
         }
     }
 
-	
     std::vector< Detail::IMember<TreaterType>* >      ma_member;
 
-    template<typename, typename> friend class MemberInfo;
+    friend class MemberInfo<TreaterType, T>;
 };
-
-/// initMemberList helper
-template<typename AddMember, typename AttrList, typename T>
-void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T*)
-{
-    T::defineMetaInfo(addMember, attrList, static_cast<T*>(0));
-}
-
-template<typename AddMember, typename AttrList, typename T>
-void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T const*)
-{
-    T::defineMetaInfo(addMember, attrList, static_cast<T*>(0));
-}
 
 template<typename TreaterType, typename T>
 class MemberInfo //: boost::noncopyable
@@ -361,6 +407,7 @@ private:
     
     MemberList<TreaterType, T>        m_memberList;
 };
+
 
 
 
