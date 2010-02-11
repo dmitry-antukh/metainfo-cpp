@@ -152,7 +152,7 @@ void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T*)
 template<typename AddMember, typename AttrList, typename T>
 void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T const*)
 {
-    T::defineMetaInfo(addMember, attrList, static_cast<T*>(0));
+    defineMetaInfo(addMember, attrList, static_cast<T*>(0));
 }
 
 
