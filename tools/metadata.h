@@ -60,45 +60,9 @@
 namespace Meta
 {
 
-///////////////////////////////////////////////////////////////////////////////
-//////////////////////////  Member info  //////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-template<typename, typename T>                           class MemberInfo;
-
-/*template<typename TreaterType>
-class IMember
-{
-public:
-    //virtual void treat(TreaterType& treater, T* t) const = 0;
-    virtual void treat(TreaterType& treater, unsigned index) const = 0;
-
-    virtual ~IMember() {}
-};*/
 
 namespace Detail
 {
-
-/*
-template<typename TreaterType, typename PMemberType>
-class Member : public IMember<TreaterType>
-{
-public:
-	explicit Member(PMemberType pmember) : m_pMember(pmember)
-	{
-		//T* p = NULL;
-		/// check; //(p->*pmember);
-	}
-
-	virtual void treat(TreaterType& treater, unsigned index) const
-	{
-		treater(m_pMember, index);
-	}
-private:
-	PMemberType m_pMember;
-};
- */
-
 
 class DummyReceiver
 {
@@ -130,36 +94,16 @@ public:
 
 		return *this;
     }
-	
-	/*
-	template<typename T>
-	TreaterHelper<TreaterType>& operator << (T const& t) const
-	{
-        #if defined(__BORLANDC__)
-		t; /// to prevent bcc-warning
-		#endif // defined(__BORLANDC__)
-		
-		return *this;
-	}
-	*/	
 private:
+    explicit TreaterHelper(TreaterHelper const&);
+    TreaterHelper& operator = (TreaterHelper const&);
+
 	TreaterType& 	m_treater;
     unsigned		m_index;
 };
 
 
 } // namespace Detail
-
-
-template<typename T, typename TreaterType>
-void treatData(TreaterType& treater)
-{
-	Detail::TreaterHelper<TreaterType> helper(treater);
-	
-	Detail::DummyReceiver attrTreater;
-	
-	defineMetaInfo(helper, attrTreater, static_cast<T*>(NULL));
-}
 
 
 template<typename ClassT, typename BaseClassT>
@@ -213,6 +157,16 @@ void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T const*)
     defineMetaInfo(addMember, attrList, static_cast<T*>(0));
 }
 
+
+template<typename T, typename TreaterType>
+void treatData(TreaterType& treater)
+{
+	Detail::TreaterHelper<TreaterType> helper(treater);
+	
+	Detail::DummyReceiver attrTreater;
+	
+	defineMetaInfo(helper, attrTreater, static_cast<T*>(NULL));
+}
 
 template<typename T>
 class Attribute
@@ -385,100 +339,6 @@ private:
 template<typename T>
 bool Attribute<T>::m_inited = false;
 
-
-/*
-template<typename TreaterType, typename T>
-class MemberList
-{
-public:
-    template<typename PMemberType>
-    MemberList<TreaterType, T>& operator() (PMemberType pMember)
-    {
-        IMember<TreaterType>* mt =
-            new Detail::Member<TreaterType, PMemberType>(pMember);
-
-        ma_member.push_back(mt);
-
-		return *this;
-    }
-
-	template<typename Attr>
-	MemberList<TreaterType, T>& operator << (Attr const& attr)
-	{
-        #if defined(__BORLANDC__)
-		attr; /// to prevent bcc-warning
-		#endif // defined(__BORLANDC__)
-		
-		return *this;
-	}
-private:
-    explicit MemberList() {}
-
-    ~MemberList() 
-    {
-        for(unsigned i=0; i<ma_member.size(); ++i)
-        {
-            delete ma_member[i];
-        }
-    }
-
-    std::vector< IMember<TreaterType>* >      ma_member;
-
-    friend class MemberInfo<TreaterType, T>;
-};
-
-template<typename TreaterType, typename T>
-class MemberInfo //: boost::noncopyable
-{
-public:
-    static MemberInfo<TreaterType, T>& inst()
-    {
-        static MemberInfo<TreaterType, T> s_inst;
-
-        return s_inst;
-    }
-
-    void treatData(TreaterType& treater) const
-    {
-        for(unsigned i = 0; i < m_memberList.ma_member.size(); ++i)
-        {
-            m_memberList.ma_member[i]->treat(treater, i);
-        }
-    }
-    
-private:
-    MemberInfo() 
-    {
-		Detail::DummyReceiver 	attrTreater;
-        defineMetaInfo(m_memberList, attrTreater, static_cast<T*>(NULL));
-    }
-    //noncopyable
-    MemberInfo(MemberInfo<TreaterType, T> const&);
-    MemberInfo<TreaterType, T>& operator = (MemberInfo<TreaterType, T> const&);
-    
-    MemberList<TreaterType, T>        m_memberList;
-};
-*/
-
-
-
-//template<typename Attr, typename TreaterType, typename T>
-//inline void treatData(live_ptr<TreaterType> treater, T* data)
-//{
-//    MemberInfo<T, Attr>::inst().treatData(treater, data);
-//
-//    //std::cout << "treatData: treater type=" << typeid(TreaterType).name() 
-//      //        << "           data type=" << typeid(T).name() << std::endl << std::endl;
-//}
-//
-//template<typename Attr, typename TreaterType, typename T>
-//inline void treatData(live_ptr<TreaterType> treater, T const& data)
-//{
-//    MemberInfo<T, Attr>::inst().treatData(treater, data);
-//
-//    //std::cout << "treatData: treater type=" << typeid(TreaterType).name() 
-//    //        << "           data type=" << typeid(T).name() << std::endl << std::endl;
-//}
 
 } // namespace Meta
 
