@@ -1,8 +1,6 @@
 #ifndef Metadata_060909_H
 #define Metadata_060909_H
 
-#include <assert.h>
-#include <typeinfo>
 #include <vector>
 #include <string>
 
