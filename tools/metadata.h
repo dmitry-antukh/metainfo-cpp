@@ -66,7 +66,7 @@ namespace Meta
 
 template<typename, typename T>                           class MemberInfo;
 
-template<typename TreaterType>
+/*template<typename TreaterType>
 class IMember
 {
 public:
@@ -74,7 +74,7 @@ public:
     virtual void treat(TreaterType& treater, unsigned index) const = 0;
 
     virtual ~IMember() {}
-};
+};*/
 
 namespace Detail
 {
