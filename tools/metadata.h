@@ -18,8 +18,8 @@
 #   error METADATA already defined
 #else // !defined(METADATA)
 #   define METADATA(TypeName) 										                    \
-    	template<typename AddMember, typename AttrTreater>								    \
-	    static void defineMetaInfo(AddMember& addMember, AttrTreater const& attrTreater, TypeName*) \
+    	template<typename TreaterType, typename AttrTreater>								    \
+	    static void defineMetaInfo(TreaterType& treater, AttrTreater const& attrTreater, TypeName*) \
 	    {															                    \
 		    typedef TypeName		TypeT;
 #endif // !defined(METADATA)
@@ -36,7 +36,7 @@
 #   error MEMBER already defined
 #else // !defined(MEMBER)
 #   define MEMBER(memberName)										\
-	    addMember(&TypeT::memberName) << ::Meta::Name(#memberName)
+	    treater(&TypeT::memberName) << ::Meta::Name(#memberName)
 #endif // !defined(MEMBER)
 
 
@@ -52,7 +52,7 @@
 #else // !defined(BASE_CLASS)
 #   define BASE_CLASS(BaseClassName) 										    \
 		typedef BaseClassName 				BaseClassName_BccWA;				\
-        addMember(Meta::BaseClass<TypeT, BaseClassName_BccWA>())
+        treater(Meta::BaseClass<TypeT, BaseClassName_BccWA>())
 #endif // !defined(BASE_CLASS)
 
 
