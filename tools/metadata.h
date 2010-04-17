@@ -18,8 +18,8 @@
 #   error METADATA already defined
 #else // !defined(METADATA)
 #   define METADATA(TypeName) 										                    \
-    	template<typename AddMember, typename AttrList>								    \
-	    static void defineMetaInfo(AddMember& addMember, AttrList const& attrList, TypeName*) \
+    	template<typename AddMember, typename AttrTreater>								    \
+	    static void defineMetaInfo(AddMember& addMember, AttrTreater const& attrTreater, TypeName*) \
 	    {															                    \
 		    typedef TypeName		TypeT;
 #endif // !defined(METADATA)
@@ -28,7 +28,7 @@
 #if defined(ATTRIBUTES)
 #   error ATTRIBUTES already defined
 #else // !defined(ATTRIBUTES)
-#   define ATTRIBUTES  attrList
+#   define ATTRIBUTES  attrTreater
 #endif // !defined(ATTRIBUTES)
 
 
@@ -79,26 +79,87 @@ public:
 namespace Detail
 {
 
+/*
 template<typename TreaterType, typename PMemberType>
 class Member : public IMember<TreaterType>
 {
 public:
-    explicit Member(PMemberType pmember) : m_pMember(pmember)
-    {
-        //T* p = NULL;
-        /// check; //(p->*pmember);
-    }
+	explicit Member(PMemberType pmember) : m_pMember(pmember)
+	{
+		//T* p = NULL;
+		/// check; //(p->*pmember);
+	}
 
-    virtual void treat(TreaterType& treater, unsigned index) const
-    {
-        treater(m_pMember, index);
-    }
+	virtual void treat(TreaterType& treater, unsigned index) const
+	{
+		treater(m_pMember, index);
+	}
 private:
-    PMemberType m_pMember;
+	PMemberType m_pMember;
+};
+ */
+
+
+class DummyReceiver
+{
+public:
+	template<typename T>
+	DummyReceiver const& operator << (T const& t) const
+	{
+        #if defined(__BORLANDC__)
+		t; /// to prevent bcc-warning
+		#endif // defined(__BORLANDC__)
+		
+		return *this;
+	}	
+};
+
+
+template<typename TreaterType>
+class TreaterHelper : public DummyReceiver
+{
+public:
+	explicit TreaterHelper(TreaterType& treater) : 
+		m_treater(treater), m_index(0)
+	{}
+
+    template<typename PMemberType>
+    TreaterHelper<TreaterType>& operator() (PMemberType pMember)
+    {
+        m_treater(pMember, m_index++);
+
+		return *this;
+    }
+	
+	/*
+	template<typename T>
+	TreaterHelper<TreaterType>& operator << (T const& t) const
+	{
+        #if defined(__BORLANDC__)
+		t; /// to prevent bcc-warning
+		#endif // defined(__BORLANDC__)
+		
+		return *this;
+	}
+	*/	
+private:
+	TreaterType& 	m_treater;
+    unsigned		m_index;
 };
 
 
 } // namespace Detail
+
+
+template<typename T, typename TreaterType>
+void treatData(TreaterType& treater)
+{
+	Detail::TreaterHelper<TreaterType> helper(treater);
+	
+	Detail::DummyReceiver attrTreater;
+	
+	defineMetaInfo(helper, attrTreater, static_cast<T*>(NULL));
+}
 
 
 template<typename ClassT, typename BaseClassT>
@@ -325,26 +386,7 @@ template<typename T>
 bool Attribute<T>::m_inited = false;
 
 
-template<typename TreaterType, typename T>
-class AttrList
-{
-public:
-	template<typename Attr>
-	AttrList const& operator << (Attr const& attr) const
-	{
-        #if defined(__BORLANDC__)
-		attr; /// to prevent bcc-warning
-		#endif // defined(__BORLANDC__)
-		
-		return *this;
-	}
-	
-private:
-    explicit AttrList() {}
-
-    friend class MemberInfo<TreaterType, T>;
-};
-
+/*
 template<typename TreaterType, typename T>
 class MemberList
 {
@@ -407,8 +449,8 @@ public:
 private:
     MemberInfo() 
     {
-        AttrList<TreaterType, T> attrList;
-        defineMetaInfo(m_memberList, attrList, static_cast<T*>(NULL));
+		Detail::DummyReceiver 	attrTreater;
+        defineMetaInfo(m_memberList, attrTreater, static_cast<T*>(NULL));
     }
     //noncopyable
     MemberInfo(MemberInfo<TreaterType, T> const&);
@@ -416,7 +458,7 @@ private:
     
     MemberList<TreaterType, T>        m_memberList;
 };
-
+*/
 
 
 

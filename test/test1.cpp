@@ -22,5 +22,5 @@ void print(std::string const& descr, S const& s)
     
     PrintStruct<S> treater(s);
     
-    Meta::MemberInfo<PrintStruct<S>, S>::inst().treatData(treater);
+    Meta::treatData<S>(treater);
 }

@@ -91,7 +91,7 @@ public:
 	{
 		PrintStruct<BaseClassT> printStruct(m_data, m_s);
 		
-		Meta::MemberInfo<PrintStruct<BaseClassT>, BaseClassT>::inst().treatData(printStruct);
+		Meta::treatData<BaseClassT>(printStruct);
 	}
 private:
     /// non-copyable
@@ -113,7 +113,7 @@ private:
 
 		    PrintStruct<MT>  ps(m, s);
 
-		    Meta::MemberInfo<PrintStruct<MT>, MT>::inst().treatData(ps);
+		    Meta::treatData<MT>(ps);
 		}
 
 		static void treatData(MT const& m, std::string const& s, SimpleTypeTag)
