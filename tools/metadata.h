@@ -17,7 +17,7 @@
 #else // !defined(METADATA)
 #   define METADATA(TypeName) 										                    \
     	template<typename TreaterType, typename AttrTreater>								    \
-	    static void defineMetaInfo(TreaterType& treater, AttrTreater const& attrTreater, TypeName*) \
+	    static void processMetaData(TreaterType& treater, AttrTreater const& attrTreater, TypeName*) \
 	    {															                    \
 		    typedef TypeName		TypeT;
 #endif // !defined(METADATA)
@@ -133,15 +133,15 @@ private:
 
 /// initMemberList helper
 template<typename AddMember, typename AttrList, typename T>
-void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T*)
+void processMetaData(AddMember& addMember, AttrList const& attrList, T*)
 {
-    T::defineMetaInfo(addMember, attrList, static_cast<T*>(0));
+    T::processMetaData(addMember, attrList, static_cast<T*>(0));
 }
 
 template<typename AddMember, typename AttrList, typename T>
-void defineMetaInfo(AddMember& addMember, AttrList const& attrList, T const*)
+void processMetaData(AddMember& addMember, AttrList const& attrList, T const*)
 {
-    defineMetaInfo(addMember, attrList, static_cast<T*>(0));
+    processMetaData(addMember, attrList, static_cast<T*>(0));
 }
 
 
@@ -152,7 +152,7 @@ void treatData(TreaterType& treater)
 	
 	Detail::DummyReceiver attrTreater;
 	
-	defineMetaInfo(helper, attrTreater, static_cast<T*>(NULL));
+	processMetaData(helper, attrTreater, static_cast<T*>(NULL));
 }
 
 template<typename T>
@@ -307,7 +307,7 @@ private:
         MemberListHelper    memberListHelper;
         AttrListHelper      attrListHelper;
 
-        defineMetaInfo(memberListHelper, attrListHelper, static_cast<T*>(NULL));
+        processMetaData(memberListHelper, attrListHelper, static_cast<T*>(NULL));
     }
 
 
