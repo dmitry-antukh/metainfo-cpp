@@ -120,14 +120,6 @@ public:
 	}
 };
 
-
-struct NoAttr
-{
-    NoAttr() {}
-
-    template<typename T> NoAttr(T) {}
-};
-
 class Name
 {
 public:
@@ -137,9 +129,6 @@ public:
 private:
 	std::string 	m_name;
 };
-
-
-template<typename, typename> class MemberList;
 
 
 /// initMemberList helper
