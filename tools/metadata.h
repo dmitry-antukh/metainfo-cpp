@@ -15,10 +15,10 @@
 #if defined(METADATA)
 #   error METADATA already defined
 #else // !defined(METADATA)
-#   define METADATA(TypeName) 										                    \
-    	template<typename TreaterType, typename AttrTreater>								    \
-	    static void processMetaData(TreaterType& treater, AttrTreater const& attrTreater, TypeName*) \
-	    {															                    \
+#   define METADATA(TypeName) 										                                 \
+    	template<typename TreaterType, typename AttrTreater>								         \
+	    inline static void processMetaData(TreaterType& treater, AttrTreater const* attrTreater, TypeName*) \
+	    {															                                 \
 		    typedef TypeName		TypeT;
 #endif // !defined(METADATA)
 
@@ -26,15 +26,16 @@
 #if defined(ATTRIBUTES)
 #   error ATTRIBUTES already defined
 #else // !defined(ATTRIBUTES)
-#   define ATTRIBUTES  attrTreater
+#   define ATTRIBUTES  (NULL == attrTreater) ? AttrTreater() : *attrTreater
 #endif // !defined(ATTRIBUTES)
 
 
 #if defined(MEMBER)
 #   error MEMBER already defined
 #else // !defined(MEMBER)
-#   define MEMBER(memberName)										\
-	    treater(&TypeT::memberName) << ::Meta::Name(#memberName)
+#   define MEMBER(memberName)										                        \
+	    (NULL == attrTreater) ? treater(&TypeT::memberName) :                               \
+	                            (treater(&TypeT::memberName) << ::Meta::Name(#memberName)) 
 #endif // !defined(MEMBER)
 
 
@@ -48,17 +49,16 @@
 #if defined(BASE_CLASS)
 #   error BASE_CLASS already defined
 #else // !defined(BASE_CLASS)
-#   define BASE_CLASS(BaseClassName) 										    \
-		typedef BaseClassName 				BaseClassName_BccWA;				\
-        treater(Meta::BaseClass<TypeT, BaseClassName_BccWA>())
+#   define BASE_CLASS(BaseClassName) 										                \
+		typedef BaseClassName 				BaseClassName_BccWA;				            \
+        (NULL == attrTreater) ? treater(Meta::BaseClass<TypeT, BaseClassName_BccWA>()) :    \
+                                treater(Meta::BaseClass<TypeT, BaseClassName_BccWA>())
 #endif // !defined(BASE_CLASS)
 
 
 
 namespace Meta
 {
-
-
 namespace Detail
 {
 
@@ -133,26 +133,24 @@ private:
 
 /// initMemberList helper
 template<typename AddMember, typename AttrList, typename T>
-void processMetaData(AddMember& addMember, AttrList const& attrList, T*)
+inline void processMetaData(AddMember& addMember, AttrList const* attrList, T*)
 {
     T::processMetaData(addMember, attrList, static_cast<T*>(0));
 }
 
 template<typename AddMember, typename AttrList, typename T>
-void processMetaData(AddMember& addMember, AttrList const& attrList, T const*)
+inline void processMetaData(AddMember& addMember, AttrList const* attrList, T const*)
 {
     processMetaData(addMember, attrList, static_cast<T*>(0));
 }
 
 
 template<typename T, typename TreaterType>
-void treatData(TreaterType& treater)
+inline void treatData(TreaterType& treater)
 {
 	Detail::TreaterHelper<TreaterType> helper(treater);
 	
-	Detail::DummyReceiver attrTreater;
-	
-	processMetaData(helper, attrTreater, static_cast<T*>(NULL));
+	processMetaData(helper, static_cast<Detail::DummyReceiver*>(NULL), static_cast<T*>(NULL));
 }
 
 template<typename T>
@@ -307,7 +305,7 @@ private:
         MemberListHelper    memberListHelper;
         AttrListHelper      attrListHelper;
 
-        processMetaData(memberListHelper, attrListHelper, static_cast<T*>(NULL));
+        processMetaData(memberListHelper, &attrListHelper, static_cast<T*>(NULL));
     }
 
 
