@@ -316,8 +316,6 @@ private:
 		
     static bool m_inited;
 private:
-	template<typename, typename> friend class MemberList;
-	template<typename, typename> friend class AttrList;
     template<typename> friend class Impl;
 };
 
