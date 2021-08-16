@@ -1,10 +1,12 @@
-#ifndef PCH_170909_H
-#define PCH_170909_H
+#ifndef PCH_069e38df4317ffc666c5_H
+#define PCH_069e38df4317ffc666c5_H
 
 
 #include <assert.h>
 
 #define META_LIB_ASSERT(expr, errorDescription) assert(expr)
+//#define META_LIB_ASSERT(expr, errorDescription) do if(!(expr)) throw std::runtime_error(#errorDescription); while(0)
+//do if(!(expr)) throw std::runtime_error(#errorDescription); while(0);
 
 
 #if defined(__BORLANDC__)
@@ -18,4 +20,4 @@
 #endif // _MSC_VER == 1400
 
 
-#endif  // PCH_170909_H
+#endif  // PCH_069e38df4317ffc666c5_H
